@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLOW · Bajaj Finserv GigAssist</title>
+<style>
+  :root{
+    --navy:#0A2A6B; --navy-2:#0E357F; --blue:#1462D6; --cyan:#00A9E0;
+    --ink:#0F1B2D; --muted:#63738C; --line:#E6ECF5; --bg:#EEF3FA; --card:#FFFFFF;
+    --good:#12946B; --good-bg:#E5F5EE; --warn:#D98A1F; --warn-bg:#FBF0DC;
+    --blue-bg:#E9F1FE; --green-bg:#E6F5EC; --amber-bg:#FCF3DC; --purple:#6C4BD6; --purple-bg:#EEE9FB;
+    --shadow:0 1px 2px rgba(10,42,107,.05),0 8px 22px rgba(10,42,107,.07);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+  .app{display:flex;min-height:100vh}
+
+  /* ---------- sidebar ---------- */
+  .side{width:236px;flex:none;background:linear-gradient(185deg,#0A2A6B,#0C2E75 60%,#0B4AB0);
+    color:#fff;padding:22px 16px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh}
+  .logo{display:flex;align-items:center;gap:11px;padding:2px 6px}
+  .logo .b{width:40px;height:40px;border-radius:9px;background:#fff;display:grid;place-items:center;flex:none}
+  .logo .b svg{width:24px;height:24px}
+  .logo .t{font-weight:800;font-size:15px;line-height:1.05;letter-spacing:.3px}
+  .logo .t small{display:block;font-size:9.5px;font-weight:600;letter-spacing:2px;opacity:.7}
+  nav{display:flex;flex-direction:column;gap:3px}
+  .nav{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:11px;color:#C9D8F5;
+    font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+  .nav svg{width:19px;height:19px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7}
+  .nav:hover{background:rgba(255,255,255,.08);color:#fff}
+  .nav.on{background:#fff;color:var(--navy);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+  .promo{margin-top:auto;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);
+    border-radius:14px;padding:15px 15px 6px}
+  .promo h4{margin:0;font-size:14px;font-weight:800;line-height:1.15}
+  .promo p{margin:6px 0 10px;font-size:11.5px;opacity:.8}
+  .promo .ill{display:flex;gap:6px;font-size:26px;filter:saturate(1.2)}
+
+  /* ---------- main ---------- */
+  .main{flex:1;min-width:0;padding:22px 26px 30px}
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+  .welcome .hi{font-size:12.5px;color:var(--muted)}
+  .welcome .nm{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .welcome h1{font-size:24px;margin:1px 0;font-weight:800;letter-spacing:-.3px}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--blue);
+    background:var(--blue-bg);padding:4px 10px;border-radius:999px}
+  .role{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;margin-top:2px}
+  .role .v{color:var(--good);font-weight:700}
+  .rightbar{display:flex;align-items:center;gap:18px}
+  .tagline{color:var(--navy);font-weight:800;font-size:15px}
+  .iconbtn{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-weight:600;cursor:pointer}
+  .iconbtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7}
+
+  /* ---------- kpi row ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+  .kpi{border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:112px}
+  .kpi .k{font-size:13px;font-weight:700;color:#3a4a63}
+  .kpi .v{font-size:26px;font-weight:800;letter-spacing:-.5px;margin-top:6px}
+  .kpi .s{font-size:11.5px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:6px}
+  .kpi.b{background:var(--blue-bg)} .kpi.g{background:var(--green-bg)}
+  .kpi.a{background:var(--amber-bg)} .kpi.p{background:var(--purple-bg)}
+  .kpi .ic{position:absolute;right:14px;top:14px;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.65)}
+  .kpi .ic svg{width:22px;height:22px;fill:none;stroke-width:1.8}
+  .delta{font-weight:700;padding:1px 7px;border-radius:999px;font-size:11px}
+  .delta.dn{color:#C0392B;background:#FBE7E4} .delta.up{color:var(--good);background:var(--good-bg)}
+  .limitbar{height:7px;border-radius:999px;background:#DED4F5;margin-top:9px;overflow:hidden}
+  .limitbar i{display:block;height:100%;width:33%;background:linear-gradient(90deg,var(--purple),#9a7ef0);border-radius:999px}
+  /* gigscore gauge */
+  .gs{display:flex;align-items:center;gap:12px;margin-top:2px}
+  .gsval{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .gsval small{font-size:13px;color:var(--muted);font-weight:600}
+  .gsstate{font-size:12px;font-weight:800;color:var(--good)}
+
+  /* ---------- grids ---------- */
+  .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+  .grid2b{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+  .ch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+  .ch h2{font-size:15.5px;margin:0;font-weight:750}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--blue)}
+  .sub{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+  .pillflex{font-size:11px;font-weight:700;color:var(--good);background:var(--good-bg);padding:4px 11px;border-radius:999px}
+  .legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);align-items:center}
+  .legend i{display:inline-block;width:16px;height:0;border-top:3px solid var(--blue);border-radius:2px;margin-right:5px;vertical-align:middle}
+  .legend i.avg{border-top:2px dashed #9AABC6}
+  .drop{font-size:12px;font-weight:600;color:var(--navy);border:1px solid var(--line);border-radius:9px;padding:5px 10px;background:#fff}
+
+  .chart{width:100%;height:auto;display:block;margin-top:6px}
+  .alert{margin-top:12px;display:flex;align-items:center;gap:12px;background:var(--warn-bg);border:1px solid #F0D9AE;border-radius:12px;padding:12px 14px}
+  .alert .ai{width:34px;height:34px;border-radius:9px;background:var(--warn);color:#fff;display:grid;place-items:center;flex:none;font-size:17px}
+  .alert .at{flex:1}
+  .alert .at b{font-size:13px;color:#9a6412} .alert .at span{font-size:12px;color:#7d5a1c;display:block}
+  .alert a{font-size:12.5px;font-weight:700;color:var(--blue);white-space:nowrap;text-decoration:none}
+  .earnslider{margin-top:14px;background:#F7FAFF;border:1px solid var(--line);border-radius:12px;padding:11px 15px}
+  .earnslider .lab{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:7px}
+
+  /* repayment plan card */
+  .plan .expected{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+  .plan .expected b{font-size:16px;color:var(--ink)}
+  .paywrap{display:flex;gap:12px;align-items:stretch;margin-bottom:6px}
+  .payblock{flex:1}
+  .payblock .k{font-size:12.5px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px}
+  .payblock .v{font-size:32px;font-weight:800;letter-spacing:-.5px;margin-top:2px;color:var(--blue)}
+  .tagsm{font-size:10.5px;font-weight:700;color:var(--good);background:var(--good-bg);padding:2px 8px;border-radius:999px}
+  .deferbox{width:118px;flex:none;background:#F1F5FB;border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:right}
+  .deferbox .k{font-size:11px;color:var(--muted);font-weight:600}
+  .deferbox .v{font-size:20px;font-weight:800;color:var(--warn);margin-top:2px}
+  .deferbox.zero .v{color:var(--good)}
+  .sugmark{position:relative;height:16px;margin:2px 0 -2px}
+  .sugmark .m{position:absolute;transform:translateX(-50%);font-size:10.5px;font-weight:700;color:#0089B8;white-space:nowrap}
+  .sugmark .m::after{content:"";display:block;width:1px;height:7px;background:#00A9E0;margin:1px auto 0}
+  .bandtrack{margin-top:4px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;outline:none;
+    background:linear-gradient(90deg,var(--blue) 0%,var(--blue) var(--fill,50%),#DBE6F6 var(--fill,50%),#DBE6F6 100%)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;
+    background:#fff;border:5px solid var(--blue);box-shadow:0 3px 9px rgba(20,98,214,.4);cursor:grab}
+  input[type=range]::-webkit-slider-thumb:active{cursor:grabbing}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:5px solid var(--blue);box-shadow:0 3px 9px rgba(20,98,214,.4);cursor:grab}
+  #earn{background:linear-gradient(90deg,var(--cyan) 0%,var(--cyan) var(--fill,40%),#DBE6F6 var(--fill,40%),#DBE6F6 100%)}
+  #earn::-webkit-slider-thumb{border-color:var(--cyan);width:18px;height:18px} #earn::-moz-range-thumb{border-color:var(--cyan)}
+  .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:8px}
+  .ends b{color:var(--ink)}
+  .quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .qb{font-size:11.5px;font-weight:650;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;font-family:inherit;transition:.15s}
+  .qb:hover{border-color:var(--blue);color:var(--blue);background:#F5F9FF}
+  .qb.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .callout{margin-top:14px;display:flex;align-items:center;gap:11px;background:var(--good-bg);border:1px solid #BFE6D2;border-radius:12px;padding:12px 14px}
+  .callout .ci{width:32px;height:32px;border-radius:9px;background:#fff;display:grid;place-items:center;flex:none}
+  .callout .ci svg{width:18px;height:18px;stroke:var(--good);fill:none;stroke-width:1.8}
+  .callout .ct{flex:1;font-size:12.5px} .callout .ct b{color:#0c6f51}
+  .callout .arw{color:var(--good);font-size:18px}
+  .plantag{font-size:12.5px;font-weight:650;padding:8px 12px;border-radius:11px;background:var(--blue-bg);color:var(--navy);margin-top:14px;display:flex;align-items:center;gap:8px}
+  .plantag.warn{background:var(--warn-bg);color:#9a6412} .plantag.good{background:var(--good-bg);color:#0c6f51}
+
+  /* schedule */
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--muted)} .kv .v{font-weight:700}
+
+  /* flexipay + generic benefit rows */
+  .brow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .brow:last-child{border-bottom:0}
+  .brow .bi{width:34px;height:34px;border-radius:9px;flex:none;display:grid;place-items:center}
+  .brow .bi svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.8}
+  .brow .bt .name{font-size:13px;font-weight:700} .brow .bt .d{font-size:11.5px;color:var(--muted)}
+  .bi.b1{background:var(--blue)} .bi.b2{background:var(--good)} .bi.b3{background:var(--purple)}
+
+  /* projection */
+  .proj{display:flex;gap:18px;margin-top:6px}
+  .proj .col{flex:1}
+  .proj .k{font-size:12px;color:var(--muted);font-weight:600}
+  .proj .v{font-size:22px;font-weight:800;margin-top:3px}
+  .proj .v.g{color:var(--good)} .proj .v.b{color:var(--blue)}
+  .projnote{margin-top:13px;background:#F5F9FF;border:1px solid var(--blue-bg);border-radius:11px;padding:11px 13px;font-size:12.5px;color:#2a4a7a;display:flex;gap:9px;align-items:center}
+  .projnote svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.8;flex:none}
+
+  /* classification + intelligence (differentiators) */
+  .rows .row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px}
+  .rows .row:last-child{border-bottom:0}
+  .row .tick{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:800}
+  .row.inc .tick{background:var(--good-bg);color:var(--good)} .row.exc .tick{background:#F3F5F8;color:#9aa7b8}
+  .row .desc{flex:1} .row .desc small{display:block;color:var(--muted);font-size:11px}
+  .row.exc .amt{color:#9aa7b8;text-decoration:line-through} .row .amt{font-weight:700}
+  .classfoot{margin-top:12px;background:linear-gradient(120deg,#F5F9FF,#EAF2FF);border:1px solid #D6E4FB;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .classfoot .k{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700}
+  .classfoot .v{font-size:22px;font-weight:800;color:var(--navy)}
+  .classfoot .cfside{text-align:right;font-size:11.5px;color:var(--muted)} .strike{color:#9aa7b8}
+  .models{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .model{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#FCFDFF;transition:.25s}
+  .model .mi{width:34px;height:34px;border-radius:9px;flex:none;display:grid;place-items:center;color:#fff;font-size:15px;background:linear-gradient(150deg,var(--navy),var(--blue))}
+  .model .mt{flex:1} .model .mt .name{font-size:12.5px;font-weight:700} .model .mt .st{font-size:11.5px;color:var(--muted)}
+  .model .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--good-bg);color:var(--good);white-space:nowrap}
+  .model.alert{border-color:#F0D9AE;background:var(--warn-bg)}
+  .model.alert .mi{background:linear-gradient(150deg,#C67C12,var(--warn))} .model.alert .badge{background:#fff;color:var(--warn)}
+
+  /* governance */
+  .gov{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .g{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow)}
+  .g .gi{width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;background:var(--good-bg);color:var(--good);font-size:15px}
+  .g .gt{font-size:12.5px;font-weight:700} .g .gs{font-size:11.5px;color:var(--muted);margin-top:1px}
+
+  /* rewards bar */
+  .rewards{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),#123a92 60%,var(--blue));
+    color:#fff;border-radius:var(--r);padding:16px 20px;box-shadow:var(--shadow)}
+  .rewards .rt{display:flex;align-items:center;gap:11px;font-weight:700;font-size:14px}
+  .rewards .rt .rg{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:18px}
+  .rewards .prog{flex:1;min-width:200px}
+  .rewards .prog .lab{font-size:12px;opacity:.9;margin-bottom:6px}
+  .rewards .prog .bar{height:8px;border-radius:999px;background:rgba(255,255,255,.22);overflow:hidden}
+  .rewards .prog .bar i{display:block;height:100%;width:58%;background:linear-gradient(90deg,#8FE1FF,#fff);border-radius:999px}
+  .rewards .rbtn{background:#fff;color:var(--navy);font-weight:750;font-size:13px;border:0;border-radius:11px;padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit}
+  .rewards .rbtn svg{width:17px;height:17px;stroke:var(--navy);fill:none;stroke-width:1.8}
+
+  .foot{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
+  .foot b{color:var(--navy)}
+
+  @media(max-width:1050px){.grid2,.grid2b{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:820px){.side{display:none}.main{padding:18px}.kpis{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="side">
+    <div class="logo">
+      <div class="b"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" fill="#0A2A6B"/><path d="M8 7h5a3 3 0 0 1 0 6H8zM8 13h5.5a3 3 0 0 1 0 6H8z" stroke="#fff" stroke-width="1.6"/></svg></div>
+      <div class="t">BAJAJ<br>FINSERV<small>GIGASSIST</small></div>
+    </div>
+    <nav>
+      <div class="nav on"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Dashboard</div>
+      <div class="nav"><svg viewBox="0 0 24 24"><path d="M4 7h16v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 7l2-3h12l2 3M15 13h3"/></svg>My Earnings</div>
+      <div class="nav"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg>Repayment Plan</div>
+      <div class="nav"><svg viewBox="0 0 24 24"><path d="M12 21C6 17 3 13 3 8.5 3 6 5 4 7.5 4 9.4 4 11 5.2 12 7c1-1.8 2.6-3 4.5-3C19 4 21 6 21 8.5 21 13 18 17 12 21z"/><path d="M4 12h4l1.5-3 2.5 6 2-4 1 1h5"/></svg>Credit Health</div>
+      <div class="nav"><svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M4 13h16M12 9v11M12 9c-1.5-3-5-3-5-.5S10 9 12 9zM12 9c1.5-3 5-3 5-.5S14 9 12 9z"/></svg>Incentives</div>
+      <div class="nav"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H12v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H12v15h6.5A1.5 1.5 0 0 1 20 20.5z"/></svg>Learning Hub</div>
+      <div class="nav"><svg viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1M4 13a2 2 0 0 0 2 2h1v-5H6a2 2 0 0 0-2 2zM20 13a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2zM17 15v1a3 3 0 0 1-3 3h-2"/></svg>Support</div>
+    </nav>
+    <div class="promo">
+      <h4>Bajaj Finserv GigAssist</h4>
+      <p>Har step pe aapke saath</p>
+      <div class="ill">🧑🏽‍💼👩🏽‍💼</div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <!-- topbar -->
+    <div class="topbar">
+      <div class="welcome">
+        <div class="hi">Welcome back,</div>
+        <div class="nm"><h1>Ravi Kumar</h1><span class="badge">✔ Pro Member</span></div>
+        <div class="role">Delivery Partner <span class="v">✔</span></div>
+      </div>
+      <div class="rightbar">
+        <div class="tagline">Your Growth. Our Support.</div>
+        <div class="iconbtn"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6zM10 20a2 2 0 0 0 4 0"/></svg>Notifications</div>
+        <div class="iconbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Profile</div>
+      </div>
+    </div>
+
+    <!-- KPI row -->
+    <div class="kpis">
+      <div class="kpi b">
+        <div class="k">This Month's Earnings</div>
+        <div class="v num" id="kEarn">₹8,200</div>
+        <div class="s">vs last month <span class="delta dn" id="kDelta">↓ 18%</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" stroke="#1462D6"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg></div>
+      </div>
+      <div class="kpi g">
+        <div class="k">Average Monthly Earnings</div>
+        <div class="v num">₹10,000</div>
+        <div class="s">last 3 months</div>
+        <div class="ic"><svg viewBox="0 0 24 24" stroke="#12946B"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></div>
+      </div>
+      <div class="kpi a">
+        <div class="k">GigScore</div>
+        <div class="gs">
+          <svg width="86" height="52" viewBox="0 0 86 52">
+            <defs><linearGradient id="gsg" x1="0" x2="1"><stop offset="0" stop-color="#E8B62B"/><stop offset="1" stop-color="#12946B"/></linearGradient></defs>
+            <path d="M8 46 A35 35 0 0 1 78 46" fill="none" stroke="#EFE4C4" stroke-width="9" stroke-linecap="round"/>
+            <path id="gsArc" d="M8 46 A35 35 0 0 1 78 46" fill="none" stroke="url(#gsg)" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="85 100"/>
+          </svg>
+          <div><div class="gsval num">720 <small>/ 850</small></div><div class="gsstate">Good</div></div>
+        </div>
+        <div class="ic"><svg viewBox="0 0 24 24" stroke="#D98A1F"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      </div>
+      <div class="kpi p">
+        <div class="k">Available Credit Limit</div>
+        <div class="v num">₹45,000</div>
+        <div class="s">Used ₹15,000 (33%)</div>
+        <div class="limitbar"><i></i></div>
+        <div class="ic"><svg viewBox="0 0 24 24" stroke="#6C4BD6"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M16 14h2"/></svg></div>
+      </div>
+    </div>
+
+    <!-- chart + repayment plan -->
+    <div class="grid2">
+      <!-- earnings overview -->
+      <div class="card">
+        <div class="ch">
+          <div><div class="eyebrow">Earnings Overview</div><h2>Actual vs average earnings</h2></div>
+          <div class="legend"><span><i></i>Actual</span><span><i class="avg"></i>Average</span><span class="drop">6 Months ▾</span></div>
+        </div>
+        <svg class="chart" viewBox="0 0 640 300" role="img" aria-label="Earnings chart">
+          <!-- y grid + labels -->
+          <g font-size="11" fill="#9aa7b8">
+            <line x1="55" y1="30" x2="620" y2="30" stroke="#EEF2F8"/><text x="45" y="34" text-anchor="end">₹15K</text>
+            <line x1="55" y1="103" x2="620" y2="103" stroke="#EEF2F8"/><text x="45" y="107" text-anchor="end">₹10K</text>
+            <line x1="55" y1="177" x2="620" y2="177" stroke="#EEF2F8"/><text x="45" y="181" text-anchor="end">₹5K</text>
+            <line x1="55" y1="250" x2="620" y2="250" stroke="#E6ECF5"/><text x="45" y="254" text-anchor="end">₹0</text>
+          </g>
+          <!-- average dashed line at 10k -->
+          <line x1="55" y1="103" x2="620" y2="103" stroke="#9AABC6" stroke-width="2" stroke-dasharray="6 5"/>
+          <!-- actual polyline -->
+          <polyline id="line" fill="none" stroke="#1462D6" stroke-width="3" stroke-linejoin="round" points=""/>
+          <g id="pts"></g>
+          <!-- month labels -->
+          <g font-size="12" fill="#63738C" text-anchor="middle" id="mlbl"></g>
+        </svg>
+        <div class="alert" id="alert">
+          <div class="ai">↻</div>
+          <div class="at"><b id="alertT">Earnings below average this month</b><span id="alertS">Don't worry — we've adjusted your repayment to match your income.</span></div>
+          <a href="#">Know More ›</a>
+        </div>
+        <div class="earnslider">
+          <div class="lab"><span>Adjust this month's earnings <span style="color:var(--muted);font-weight:500">(demo)</span></span><span class="num" id="earnVal" style="color:var(--cyan)">₹8,200</span></div>
+          <input id="earn" type="range" min="5000" max="16000" step="100" value="8200" aria-label="This month earnings (demo)">
+        </div>
+      </div>
+
+      <!-- repayment plan -->
+      <div class="card plan">
+        <div class="ch"><div><div class="eyebrow">Your Repayment Plan</div><h2>Set your EMI · June</h2></div><span class="pillflex">Flexible</span></div>
+        <div class="expected"><span>Full EMI (Expected)</span><b class="num">₹10,000</b></div>
+
+        <div class="paywrap">
+          <div class="payblock">
+            <div class="k">You pay this month <span class="tagsm">Pay Now</span></div>
+            <div class="v num" id="payNow">₹8,000</div>
+          </div>
+          <div class="deferbox" id="deferBox">
+            <div class="k">Deferred</div>
+            <div class="v num" id="deferAmt">₹2,000</div>
+          </div>
+        </div>
+
+        <div class="sugmark"><div class="m" id="sugMark" style="left:50%">Flow suggests ₹8,000</div></div>
+        <div class="bandtrack">
+          <input id="emi" type="range" min="6000" max="10000" step="100" value="8000" aria-label="Set your EMI">
+        </div>
+        <div class="ends"><span>₹6,000<br><span style="font-weight:500;color:var(--muted)">Min Pay · protected floor</span></span>
+          <span style="text-align:right">₹10,000<br><span style="font-weight:500;color:var(--muted)">Full Pay</span></span></div>
+
+        <div class="quick">
+          <button type="button" data-emi="sug" class="qb">Flow's suggestion</button>
+          <button type="button" data-emi="full" class="qb">Pay full ₹10,000</button>
+          <button type="button" data-emi="floor" class="qb">Min pay ₹6,000</button>
+        </div>
+
+        <div id="planTag" class="plantag">↓ Slow month — Flow eased your EMI, rest carried forward</div>
+
+        <div class="callout" id="callout">
+          <div class="ci"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg></div>
+          <div class="ct" id="calloutT">Deferred amount of <b>₹2,000</b> will be added to next month's EMI (July).</div>
+          <div class="arw">›</div>
+        </div>
+        <div class="sub" style="margin-top:10px">It's your call — Flow sets the safe range, you choose the amount before it's due.</div>
+      </div>
+    </div>
+
+    <!-- schedule + flexipay + projection -->
+    <div class="grid3">
+      <div class="card">
+        <div class="eyebrow">Repayment Schedule</div>
+        <h2 style="font-size:15.5px;margin:2px 0 8px">Loan details</h2>
+        <div class="kv"><span class="k">Loan Amount</span><span class="v num">₹1,00,000</span></div>
+        <div class="kv"><span class="k">Tenure</span><span class="v">12 Months</span></div>
+        <div class="kv"><span class="k">EMI Start Date</span><span class="v">1 Jan 2025</span></div>
+        <div class="kv"><span class="k">Next Due Date</span><span class="v">5 Jul 2025</span></div>
+        <div class="kv"><span class="k">Total Paid (till now)</span><span class="v num">₹50,000</span></div>
+        <div class="kv"><span class="k">Remaining Amount</span><span class="v num">₹50,000</span></div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">FlexiPay Benefits</div>
+        <h2 style="font-size:15.5px;margin:2px 0 6px">Why gig partners choose Flow</h2>
+        <div class="brow"><div class="bi b1"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <div class="bt"><div class="name">Income-matched repayments</div><div class="d">Pay based on what you actually earn</div></div></div>
+        <div class="brow"><div class="bi b2"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M8 3v4M16 3v4M9 14h6"/></svg></div>
+          <div class="bt"><div class="name">Defer &amp; manage</div><div class="d">Ease part of an EMI when a month is slow</div></div></div>
+        <div class="brow"><div class="bi b3"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></div>
+          <div class="bt"><div class="name">Build better credit</div><div class="d">On-time payments lift your GigScore</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Next Month Projection · July</div>
+        <h2 style="font-size:15.5px;margin:2px 0 8px">What's coming up</h2>
+        <div class="proj">
+          <div class="col"><div class="k">Estimated Earnings</div><div class="v g num" id="projEarn">₹11,500</div></div>
+          <div class="col"><div class="k">EMI (incl. deferred)</div><div class="v b num" id="projEmi">₹12,000</div></div>
+        </div>
+        <div class="projnote"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg><span id="projNote">Keep going! You'll clear your deferred amount if earnings stay on track.</span></div>
+      </div>
+    </div>
+
+    <!-- differentiators: classification + intelligence -->
+    <div class="grid2b">
+      <div class="card">
+        <div class="ch"><div><div class="eyebrow">Under the hood · how Flow reads your account</div><h2>Not every credit is income</h2></div></div>
+        <p class="sub">Flow separates real earnings from transfers, refunds and loans — only earned income drives repayment.</p>
+        <div class="rows">
+          <div class="row inc"><div class="tick">✓</div><div class="desc">Swiggy settlements <small>recurring · same payer · daily</small></div><div class="amt num" id="swAmt">₹8,200</div></div>
+          <div class="row exc"><div class="tick">✕</div><div class="desc">Transfer from family <small>UPI · MOM · one-off</small></div><div class="amt num">₹8,000</div></div>
+          <div class="row exc"><div class="tick">✕</div><div class="desc">Friend repaid <small>personal · not business</small></div><div class="amt num">₹1,500</div></div>
+          <div class="row exc"><div class="tick">✕</div><div class="desc">Refund + cashback <small>reversal · not earned</small></div><div class="amt num">₹3,550</div></div>
+        </div>
+        <div class="classfoot">
+          <div><div class="k">Recurring earned income</div><div class="v num" id="earnedFoot">₹8,200</div></div>
+          <div class="cfside">total credits <span class="strike num" id="totalCred">₹21,250</span><br>13,050 set aside as non-income</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><div><div class="eyebrow">Flow intelligence</div><h2>Three checks, every cycle</h2></div></div>
+        <div class="models">
+          <div class="model"><div class="mi">₹</div><div class="mt"><div class="name">Repayment banding</div><div class="st" id="m1s">Safe band ₹6,000 – ₹10,000 · you choose inside it</div></div><div class="badge">Active</div></div>
+          <div class="model" id="m2"><div class="mi">↗</div><div class="mt"><div class="name">Drift detection</div><div class="st" id="m2s">Income trend: easing — within normal range</div></div><div class="badge" id="m2b">Watching</div></div>
+          <div class="model" id="m3"><div class="mi">◇</div><div class="mt"><div class="name">Anomaly check</div><div class="st" id="m3s">All credits verified · nothing unusual</div></div><div class="badge" id="m3b">Clear</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- governance -->
+    <div class="gov">
+      <div class="g"><div class="gi">⛨</div><div><div class="gt">Floor protected</div><div class="gs">EMI never drops below ₹6,000 without a hardship review.</div></div></div>
+      <div class="g"><div class="gi">⟳</div><div><div class="gt">Consent reversible</div><div class="gs">Switch off Account Aggregator access anytime.</div></div></div>
+      <div class="g"><div class="gi">◉</div><div><div class="gt">Anomalies → human review</div><div class="gs">Odd swings are flagged, never auto-adjusted.</div></div></div>
+    </div>
+
+    <!-- rewards bar -->
+    <div class="rewards">
+      <div class="rt"><div class="rg">🏆</div>Complete 12 on-time payments to unlock a higher credit limit</div>
+      <div class="prog"><div class="lab">7 / 12 payments done</div><div class="bar"><i></i></div></div>
+      <button class="rbtn"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8V5M12 8c-2 0-4-1-4-2.5S10 3 12 5c2-2 4-1.5 4 .5S14 8 12 8z"/></svg>View My Rewards</button>
+    </div>
+
+    <div class="foot">Illustrative concept for demonstration · numbers are indicative · <b>FLOW — Team Fine Servers, IIFT Kolkata</b></div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var AVG=10000, FULL=10000, FLOOR=6000, LAST=10000, ANOM=15000, NONINCOME=13050;
+  var CHART=[9800,11200,10400,9600,12300];   // Jan..May fixed; Jun dynamic
+  var MONTHS=['Jan','Feb','Mar','Apr','May','Jun'];
+
+  function inr(n){n=Math.round(n);var s=String(Math.abs(n)),l=s.slice(-3),r=s.slice(0,-3);
+    if(r)l=','+l; r=r.replace(/\B(?=(\d{2})+(?!\d))/g,','); return (n<0?'-':'')+'₹'+r+l;}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+  function r500(v){return Math.round(v/500)*500;}
+
+  function suggest(income){
+    if(income>=ANOM) return {emi:FULL, state:'anomaly'};
+    var raw = income>=AVG ? FULL : FULL-(AVG-income);
+    var emi = clamp(r500(raw), FLOOR, FULL);
+    var state = (emi<=FLOOR && income<AVG) ? 'floor' : (income>=AVG-250 ? 'ontrack' : 'slow');
+    return {emi:emi, state:state};
+  }
+
+  // chart geometry
+  var PX0=55, PX1=620, PY0=30, PY1=250;
+  function cx(i){return PX0 + i*((PX1-PX0)/5);}
+  function cy(v){return PY1 - (clamp(v,0,15000)/15000)*(PY1-PY0);}
+  var mlbl=document.getElementById('mlbl');
+  MONTHS.forEach(function(m,i){var t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',cx(i));t.setAttribute('y',278);t.textContent=m;mlbl.appendChild(t);});
+
+  var E={
+    earn:document.getElementById('earn'), emi:document.getElementById('emi'),
+    kEarn:document.getElementById('kEarn'), kDelta:document.getElementById('kDelta'),
+    earnVal:document.getElementById('earnVal'),
+    line:document.getElementById('line'), pts:document.getElementById('pts'),
+    alert:document.getElementById('alert'), alertT:document.getElementById('alertT'), alertS:document.getElementById('alertS'),
+    payNow:document.getElementById('payNow'), deferAmt:document.getElementById('deferAmt'), deferBox:document.getElementById('deferBox'),
+    sugMark:document.getElementById('sugMark'), planTag:document.getElementById('planTag'),
+    callout:document.getElementById('callout'), calloutT:document.getElementById('calloutT'),
+    swAmt:document.getElementById('swAmt'), earnedFoot:document.getElementById('earnedFoot'), totalCred:document.getElementById('totalCred'),
+    projEarn:document.getElementById('projEarn'), projEmi:document.getElementById('projEmi'), projNote:document.getElementById('projNote'),
+    m2:document.getElementById('m2'), m2s:document.getElementById('m2s'), m2b:document.getElementById('m2b'),
+    m3:document.getElementById('m3'), m3s:document.getElementById('m3s'), m3b:document.getElementById('m3b'),
+    qbs:Array.prototype.slice.call(document.querySelectorAll('.qb'))
+  };
+
+  var tw={};
+  function money(el,to,key){var from=tw[key]==null?to:tw[key],st=performance.now();
+    function step(n){var t=Math.min(1,(n-st)/300),e=1-Math.pow(1-t,3);el.textContent=inr(from+(to-from)*e);
+      if(t<1)requestAnimationFrame(step);else{el.textContent=inr(to);tw[key]=to;}}requestAnimationFrame(step);}
+
+  function drawChart(june,below){
+    var vals=CHART.concat([june]);
+    E.line.setAttribute('points', vals.map(function(v,i){return cx(i)+','+cy(v);}).join(' '));
+    E.pts.innerHTML='';
+    vals.forEach(function(v,i){
+      var last=(i===5);
+      var col=last?(below?'#F0862B':'#1462D6'):'#1462D6';
+      var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',cx(i));c.setAttribute('cy',cy(v));c.setAttribute('r',last?6:4.5);
+      c.setAttribute('fill','#fff');c.setAttribute('stroke',col);c.setAttribute('stroke-width',last?4:3);
+      E.pts.appendChild(c);
+      var t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',cx(i));t.setAttribute('y',cy(v)-13);t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-size','11.5');t.setAttribute('font-weight','700');t.setAttribute('fill',col);
+      t.textContent=inr(v); E.pts.appendChild(t);
+    });
+  }
+
+  function update(){
+    var income=+E.earn.value;
+    var s=suggest(income);
+    var chosen=+E.emi.value;
+    var deferred=FULL-chosen;
+
+    // sliders fill
+    E.earn.style.setProperty('--fill', ((income-5000)/(16000-5000)*100)+'%');
+    E.emi.style.setProperty('--fill', ((chosen-FLOOR)/(FULL-FLOOR)*100)+'%');
+    E.earnVal.textContent=inr(income);
+
+    // KPI this month
+    money(E.kEarn, income, 'kearn');
+    var d=Math.round((income-LAST)/LAST*100);
+    E.kDelta.className='delta '+(d<0?'dn':'up');
+    E.kDelta.textContent=(d<0?'↓ ':'↑ ')+Math.abs(d)+'%';
+
+    // chart
+    var below=income<AVG;
+    drawChart(income, below);
+    E.alert.style.display = below ? 'flex':'none';
+
+    // classification
+    money(E.swAmt, income, 'sw'); money(E.earnedFoot, income, 'ef'); money(E.totalCred, income+NONINCOME, 'tc');
+
+    // plan numbers
+    money(E.payNow, chosen, 'pay');
+    money(E.deferAmt, deferred, 'def');
+    E.deferBox.classList.toggle('zero', deferred===0);
+
+    // suggestion marker position (over the emi track)
+    var sp=((s.emi-FLOOR)/(FULL-FLOOR))*100;
+    E.sugMark.style.left=clamp(sp,7,93)+'%';
+    E.sugMark.firstChild ? (E.sugMark.textContent='Flow suggests '+inr(s.emi)) : null;
+    E.sugMark.style.opacity = Math.abs(s.emi-FULL)<250 ? 0 : 1;
+
+    // quick presets active
+    E.qbs.forEach(function(b){var k=b.getAttribute('data-emi');
+      b.classList.toggle('on', (k==='sug'&&chosen===s.emi)||(k==='full'&&chosen===FULL)||(k==='floor'&&chosen===FLOOR));});
+
+    // plan tag
+    var tag=E.planTag; tag.className='plantag';
+    if(deferred===0){ tag.className='plantag good';
+      tag.innerHTML = below ? '✓ You chose to pay full — nothing deferred, even on a slow month' : '✓ On track — paying your full EMI';
+    } else if(chosen===FLOOR){ tag.className='plantag warn'; tag.innerHTML='⛨ Min pay — your protected floor. The most Flow lets you ease.';
+    } else if(chosen<s.emi){ tag.className='plantag warn'; tag.innerHTML='↓ Below Flow\'s suggestion — still inside your safe floor';
+    } else if(chosen>s.emi){ tag.className='plantag'; tag.innerHTML='• Above Flow\'s suggestion — you chose to pay a bit more';
+    } else { tag.className='plantag'; tag.innerHTML='↓ Slow month — Flow\'s suggestion, the rest carried forward'; }
+
+    // deferred callout
+    if(deferred>0){ E.callout.style.display='flex';
+      E.calloutT.innerHTML='Deferred amount of <b>'+inr(deferred)+'</b> will be added to next month\'s EMI (July).';
+    } else { E.callout.style.display='none'; }
+
+    // projection
+    var est=r500(0.55*income + 0.45*AVG + 2500);
+    money(E.projEarn, est, 'pe');
+    money(E.projEmi, FULL+deferred, 'pm');
+    E.projNote.textContent = deferred>0
+      ? "Keep going! You'll clear your deferred "+inr(deferred)+" if earnings stay on track."
+      : "You're fully paid up this cycle — nothing to carry into July.";
+
+    // drift chip
+    if(income<AVG-2500){ E.m2s.textContent='Income trend: easing — within normal range'; E.m2b.textContent='Watching'; }
+    else if(income>AVG+2500){ E.m2s.textContent='Income trend: rising'; E.m2b.textContent='Healthy'; }
+    else { E.m2s.textContent='Income trend: stable'; E.m2b.textContent='Healthy'; }
+
+    // anomaly chip
+    if(s.state==='anomaly'){ E.m3.classList.add('alert');
+      E.m3s.textContent='Unusual ₹'+Math.round(income/1000)+'k inflow — sent for review'; E.m3b.textContent='Flagged';
+    } else { E.m3.classList.remove('alert'); E.m3s.textContent='All credits verified · nothing unusual'; E.m3b.textContent='Clear'; }
+  }
+
+  function setEmi(v){ E.emi.value=clamp(v,FLOOR,FULL); update(); }
+
+  E.earn.addEventListener('input', function(){ E.emi.value=suggest(+E.earn.value).emi; update(); });
+  E.emi.addEventListener('input', update);
+  E.qbs.forEach(function(b){ b.addEventListener('click', function(){
+    var k=b.getAttribute('data-emi');
+    if(k==='sug') setEmi(suggest(+E.earn.value).emi);
+    else if(k==='full') setEmi(FULL);
+    else if(k==='floor') setEmi(FLOOR);
+  });});
+
+  update();
+})();
+</script>
+</body>
+</html>
